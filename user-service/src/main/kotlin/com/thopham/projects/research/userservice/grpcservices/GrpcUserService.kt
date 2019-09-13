@@ -5,6 +5,7 @@ import com.thopham.projects.research.userservice.core.observe
 import com.thopham.projects.research.userservice.services.LoginUserParams
 import com.thopham.projects.research.userservice.services.RegisterUserParams
 import com.thopham.projects.research.userservice.services.UserService
+import io.grpc.Status
 import io.grpc.stub.StreamObserver
 import org.springframework.stereotype.Component
 
@@ -29,6 +30,12 @@ class GrpcUserServiceImpl(private val userService: UserService): UserServiceGrpc
                     )
                     .build()
             }
+            .onErrorMap {err ->
+                Status.INTERNAL
+                    .withDescription(err.message)
+                    .withCause(err)
+                    .asException()
+            }
             .observe(responseObserver)
     }
 
@@ -49,6 +56,12 @@ class GrpcUserServiceImpl(private val userService: UserService): UserServiceGrpc
                             .build()
                     )
                     .build()
+            }
+            .onErrorMap {err ->
+                Status.INTERNAL
+                    .withDescription(err.message)
+                    .withCause(err)
+                    .asException()
             }
             .observe(responseObserver)
     }
